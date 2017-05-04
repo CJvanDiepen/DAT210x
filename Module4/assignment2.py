@@ -1,6 +1,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
+import sys
+sys.path.append(r"C:\Users\diepencjv\repos\DAT210x\Module4")
 import assignment2_helper as helper
 
 # Look pretty...
@@ -10,7 +12,14 @@ plt.style.use('ggplot')
 
 # Do * NOT * alter this line, until instructed!
 scaleFeatures = False
+scaleFeatures = True
 
+#bgr - blood glucose random
+#bgr in mgs/dl 
+#wc - white blood cell count
+#wc in cells/cumm 
+#rc - red blood cell count 
+#rc in millions/cmm 
 
 # TODO: Load up the dataset and remove any and all
 # Rows that have a nan. You should be a pro at this
@@ -20,20 +29,21 @@ scaleFeatures = False
 # feature?
 #
 # .. your code here ..
-
-
+df = pd.read_csv(r"C:\Users\diepencjv\repos\DAT210x\Module4\Datasets\kidney_disease.csv")
+df = df.dropna()
+df = df.drop('id',1)
 
 # Create some color coded labels; the actual label feature
 # will be removed prior to executing PCA, since it's unsupervised.
 # You're only labeling by color so you can see the effects of PCA
-labels = ['red' if i=='ckd' else 'green' for i in df.classification]
+labels = ['red' if i=='ckd' else 'blue' for i in df.classification]
 
 
 # TODO: Use an indexer to select only the following columns:
 #       ['bgr','wc','rc']
 #
 # .. your code here ..
-
+df = df.ix[:,['bgr','wc','rc']]
 
 
 # TODO: Print out and check your dataframe's dtypes. You'll might
@@ -48,8 +58,8 @@ labels = ['red' if i=='ckd' else 'green' for i in df.classification]
 # an appropriate command to coerce these features into the right type.
 #
 # .. your code here ..
-
-
+df['wc'] = pd.to_numeric(df['wc'])
+df['rc'] = pd.to_numeric(df['rc'])
 
 # TODO: PCA Operates based on variance. The variable with the greatest
 # variance will dominate. Go ahead and peek into your data using a
@@ -61,7 +71,16 @@ labels = ['red' if i=='ckd' else 'green' for i in df.classification]
 # you probably didn't complete the previous step properly.
 #
 # .. your code here ..
+print(df.var())
+print(df.describe())
 
+fig = plt.figure()
+ax = fig.add_subplot(111, projection='3d')
+ax.set_title('3D Blood Info')
+ax.set_xlabel('X')
+ax.set_ylabel('Y')
+ax.set_zlabel('Z')
+ax.scatter(df.bgr, df.rc, df.wc, c='green', marker='.', alpha=0.75)
 
 
 # TODO: This method assumes your dataframe is called df. If it isn't,
@@ -78,7 +97,11 @@ if scaleFeatures: df = helper.scaleFeatures(df)
 # and that the results of your transformation are saved in 'T'.
 #
 # .. your code here ..
+from sklearn.decomposition import PCA
 
+pca = PCA(n_components=2)
+pca.fit(df)
+T = pca.transform(df)
 
 # Plot the transformed data as a scatter plot. Recall that transforming
 # the data will result in a NumPy NDArray. You can either use MatPlotLib

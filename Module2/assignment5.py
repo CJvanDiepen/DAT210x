@@ -7,7 +7,8 @@ import numpy as np
 # Load up the dataset, setting correct header labels.
 #
 # .. your code here ..
-
+headers = ['education', 'age', 'capital-gain', 'race', 'capital-loss', 'hours-per-week', 'sex', 'classification']
+df = pd.read_csv(r"C:\Users\diepencjv\repos\DAT210x\Module2\Datasets\census.data", names=headers)
 
 
 #
@@ -24,9 +25,9 @@ import numpy as np
 # na_values when loading the dataframe.
 #
 # .. your code here ..
-
-
-
+df['capital-gain'] = pd.to_numeric(df['capital-gain'], errors='coerce')
+for idx in range(0, len(df['education'].unique())):
+    print(df['education'].unique()[idx])
 #
 # TODO:
 # Look through your data and identify any potential categorical
@@ -39,7 +40,21 @@ import numpy as np
 # continuous numeric type... or a series of categories?
 #
 # .. your code here ..
+'''
+# ordinal features:
+education, classification
+# nominal features:
+race, sex
+'''
+# encode ordinal features
+#ordered_education = ['Preschool','1st-4th','5th-6th', etc.]
+ordered_classification = ['<=50K', '>50K']
 
+df.classification = df.classification.astype("category", ordered=True, categories=ordered_classification).cat.codes
+
+# encode nominal features
+df = pd.get_dummies(df,columns=['race'])
+df = pd.get_dummies(df,columns=['sex'])
 
 
 #

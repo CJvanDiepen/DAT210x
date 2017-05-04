@@ -3,6 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib
 
+import numpy as np
+
 matplotlib.style.use('ggplot') # Look Pretty
 
 def showandtell(title=None):
@@ -23,7 +25,9 @@ def showandtell(title=None):
 # Convert the date using pd.to_datetime, and the time using pd.to_timedelta
 #
 # .. your code here ..
-
+df = pd.read_csv(r"C:\Users\diepencjv\repos\DAT210x\Module5\Datasets\CDR.csv")
+df.CallDate = pd.to_datetime(df.CallDate)
+df.CallTime = pd.to_timedelta(df.CallTime)
 
 #
 # TODO: Get a distinct list of "In" phone numbers (users) and store the values in a
@@ -31,7 +35,7 @@ def showandtell(title=None):
 # Hint: https://docs.scipy.org/doc/numpy/reference/generated/numpy.ndarray.tolist.html
 #
 # .. your code here ..
-
+in_list = np.ndarray.tolist(np.unique(df.In))
 
 # 
 # TODO: Create a slice called user1 that filters to only include dataset records where the
@@ -39,7 +43,7 @@ def showandtell(title=None):
 # that is, the very first number in the dataset
 #
 # .. your code here ..
-
+user1 = df.ix[df.In == in_list[7],:]
 
 # INFO: Plot all the call locations
 user1.plot.scatter(x='TowerLon', y='TowerLat', c='gray', alpha=0.1, title='Call Locations')
@@ -69,6 +73,8 @@ showandtell()  # Comment this line out when you're ready to proceed
 # only examining records that came in on weekends (sat/sun).
 #
 # .. your code here ..
+user1_week = user1.ix[user1.DOW.str.match('Sat') | user1.DOW.str.match('Sun'), :]
+user1_week.plot.scatter(x='TowerLon', y='TowerLat', c='gray', alpha=0.1, title='Call Locations')
 
 
 #
@@ -80,7 +86,8 @@ showandtell()  # Comment this line out when you're ready to proceed
 # slice, print out its length:
 #
 # .. your code here ..
-
+user1_filt = user1_week.ix[(user1_week.CallTime < "06:00:00") | (user1_week.CallTime > "22:00:00"), :]
+user1_filt.plot.scatter(x='TowerLon', y='TowerLat', c='gray', alpha=0.1, title='Call Locations')
 
 #
 # INFO: Visualize the dataframe with a scatter plot as a sanity check. Since you're familiar
@@ -99,7 +106,7 @@ ax.set_title('Weekend Calls (<6am or >10p)')
 showandtell()  # TODO: Comment this line out when you're ready to proceed
 
 
-
+from sklearn.cluster import KMeans
 #
 # TODO: Run K-Means with a K=1. There really should only be a single area of concentration. If you
 # notice multiple areas that are "hot" (multiple areas the usr spends a lot of time at that are FAR
@@ -115,6 +122,11 @@ showandtell()  # TODO: Comment this line out when you're ready to proceed
 # Hint: Make sure you graph the CORRECT coordinates. This is part of your domain expertise.
 #
 # .. your code here ..
+model = KMeans(n_clusters=1)
+model.fit(user1_filt.ix[:,['TowerLon', 'TowerLat']])
+centroids = model.cluster_centers_
+
+ax.scatter(centroids[:,0], centroids[:,1], marker='x', c='red', alpha=0.5, linewidths=3, s=169)
 
 
 showandtell()  # TODO: Comment this line out when you're ready to proceed
