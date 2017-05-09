@@ -18,13 +18,14 @@ matplotlib.style.use('ggplot')
 
 
 # Load up the scanned armadillo
-plyfile = PlyData.read('Datasets/stanford_armadillo.ply')
+plyfile = PlyData.read(r"C:\Users\diepencjv\repos\DAT210x\Module4\Datasets\stanford_armadillo.ply")
 armadillo = pd.DataFrame({
   'x':plyfile['vertex']['z'][::reduce_factor],
   'y':plyfile['vertex']['x'][::reduce_factor],
   'z':plyfile['vertex']['y'][::reduce_factor]
 })
 
+from sklearn.decomposition import PCA
 
 def do_PCA(armadillo):
   #
@@ -42,13 +43,17 @@ def do_PCA(armadillo):
   
   from sklearn.decomposition import PCA
 
-  pca_model = PCA(2, svd_solver='full')
-  pca_model.fit(armadillo)
+#  pca_model = PCA(2, svd_solver='full')
+#  pca_model.fit(armadillo)
+#  armadillo_2d = pca_model.transform(armadillo)
 
-  armadillo_2d = pca_model.transform(armadillo)
-
+  pca = PCA(n_components=2)
+  pca.fit(armadillo)
+  armadillo_2d = pca.transform(armadillo)
+  
   return armadillo_2d
 
+from sklearn.decomposition import RandomizedPCA
 
 def do_RandomizedPCA(armadillo):
   #
@@ -76,11 +81,15 @@ def do_RandomizedPCA(armadillo):
 
   from sklearn.decomposition import PCA
 
-  pca_model = PCA(2, svd_solver='randomized')
-  pca_model.fit(armadillo)
-
-  armadillo_2d = pca_model.transform(armadillo)
+#  pca_model = PCA(2, svd_solver='randomized')
+#  pca_model.fit(armadillo)
+#  armadillo_2d = pca_model.transform(armadillo)
   
+#  random_pca = RandomizedPCA(n_components=2)
+  random_pca = PCA(n_components=2, svd_solver='randomized')
+  random_pca.fit(armadillo)
+  armadillo_2d = random_pca.transform(armadillo)
+
   return armadillo_2d
 
 
