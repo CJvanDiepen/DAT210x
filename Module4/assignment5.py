@@ -5,6 +5,8 @@ from mpl_toolkits.mplot3d import Axes3D
 import matplotlib
 import matplotlib.pyplot as plt
 
+from mpl_toolkits.mplot3d import Axes3D
+
 # Look pretty...
 # matplotlib.style.use('ggplot')
 plt.style.use('ggplot')
@@ -15,6 +17,7 @@ plt.style.use('ggplot')
 # python list. You can call it 'samples'.
 #
 # .. your code here .. 
+samples = []
 
 #
 # TODO: Write a for-loop that iterates over the images in the
@@ -22,6 +25,20 @@ plt.style.use('ggplot')
 # your list. Each .PNG image should first be loaded into a
 # temporary NDArray, just as shown in the Feature
 # Representation reading.
+#%%
+samples = []
+
+import os
+
+basedir = r'C:\Users\Sjaak\Documents\DAT210x\Module4\Datasets\ALOI\32'
+files = os.listdir(basedir)
+
+for fname in files: 
+    img = misc.imread(os.path.join(basedir,fname))
+    samples.append(img.reshape(-1))
+
+df = pd.DataFrame(samples)
+    
 #
 # Optional: Resample the image down by a factor of two if you
 # have a slower computer. You can also convert the image from
@@ -29,6 +46,42 @@ plt.style.use('ggplot')
 # effect on the algorithm's results.
 #
 # .. your code here .. 
+#%%
+from sklearn.manifold import Isomap
+
+iso = Isomap(n_neighbors=6, n_components=3)
+iso.fit(samples)
+T = iso.transform(samples)
+
+def Plot2D(T, title, x, y):
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.set_title(title)
+    ax.set_xlabel('Component: {0}'.format(x))
+    ax.set_ylabel('Component: {0}'.format(y))
+    ax.scatter(T[:,x],T[:,y], marker='.',alpha=0.7)
+
+def Plot3D(T, title, x, y, z):
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    ax.set_title(title)
+    ax.set_xlabel('Component: {0}'.format(x))
+    ax.set_ylabel('Component: {0}'.format(y))
+    ax.set_zlabel('Component: {0}'.format(z))
+    ax.scatter(T[:,x],T[:,y],T[:,z], marker='.',alpha=0.7)
+    
+Plot2D(T, title='ISO2D', x=0, y=1)
+Plot2D(T, title='ISO2D', x=1, y=2)
+Plot2D(T, title='ISO2D', x=0, y=2)
+
+Plot3D(T, title='ISO3D', x=0, y=1, z=2)
+
+for n in [5, 4, 3, 2, 1]:
+    iso = Isomap(n_neighbors=n, n_components=3)
+    iso.fit(samples)
+    T = iso.transform(samples)
+    
+    Plot3D(title='ISO3D, neighbors: %d' % n, x=0, y=1, z=2)
 
 
 #

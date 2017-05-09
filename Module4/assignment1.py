@@ -39,8 +39,15 @@ def do_PCA(armadillo):
   # you automatically. =)
   #
   # .. your code here ..
+  
+  from sklearn.decomposition import PCA
 
-  return None
+  pca_model = PCA(2, svd_solver='full')
+  pca_model.fit(armadillo)
+
+  armadillo_2d = pca_model.transform(armadillo)
+
+  return armadillo_2d
 
 
 def do_RandomizedPCA(armadillo):
@@ -67,7 +74,14 @@ def do_RandomizedPCA(armadillo):
   #
   # .. your code here ..
 
-  return None
+  from sklearn.decomposition import PCA
+
+  pca_model = PCA(2, svd_solver='randomized')
+  pca_model.fit(armadillo)
+
+  armadillo_2d = pca_model.transform(armadillo)
+  
+  return armadillo_2d
 
 
 

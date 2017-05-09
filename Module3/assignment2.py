@@ -12,6 +12,7 @@ plt.style.use('ggplot')
 # It's located at 'Datasets/wheat.data'
 # 
 # .. your code here ..
+df = pd.read_csv(r"C:\Users\Sjaak\Documents\DAT210x\Module3\Datasets\wheat.data")
 
 
 #
@@ -19,13 +20,14 @@ plt.style.use('ggplot')
 # area and perimeter features
 # 
 # .. your code here ..
-
+df.plot.scatter(x='area', y='perimeter')
 
 #
 # TODO: Create a 2d scatter plot that graphs the
 # groove and asymmetry features
 # 
 # .. your code here ..
+df.plot.scatter(x='groove', y='asymmetry')
 
 
 #
@@ -33,6 +35,7 @@ plt.style.use('ggplot')
 # compactness and width features
 # 
 # .. your code here ..
+df.plot.scatter(x='compactness', y='width')
 
 
 
