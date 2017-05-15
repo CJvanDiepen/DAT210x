@@ -1,6 +1,8 @@
+import pandas as pd
+
 # If you'd like to try this lab with PCA instead of Isomap,
 # as the dimensionality reduction technique:
-Test_PCA = True
+Test_PCA = False
 
 
 def plotDecisionBoundary(model, X, y):
@@ -53,13 +55,15 @@ def plotDecisionBoundary(model, X, y):
   plt.show()
 
 
-# 
+#%% 
 # TODO: Load in the dataset, identify nans, and set proper headers.
 # Be sure to verify the rows line up by looking at the file in a text editor.
 #
 # .. your code here ..
-
-
+names = ['sample','thickness', 'size', 'shape', 'adhesion', 'epithelial', 'nuclei', 'chromatin', 'nucleoli', 'mitoses', 'status']
+df = pd.read_csv(r"C:\Users\Sjaak\Documents\DAT210x\Module5\Datasets\breast-cancer-wisconsin.data", header=None, names=names)
+df = df.drop('sample', axis=1)
+df['nuclei'] = pd.to_numeric(df['nuclei'], errors='coerce')
 
 # 
 # TODO: Copy out the status column into a slice, then drop it from the main
@@ -71,7 +75,12 @@ def plotDecisionBoundary(model, X, y):
 # this would be a good place to drop that too if you haven't already.
 #
 # .. your code here ..
-
+label = df['status'] # 2 is benign, 4 is malignant
+indices = label[label == 2].sample(frac=.4).index
+#label = label.drop(indices)
+df = df.drop('status',axis=1)
+#df = df.drop(indices)
+print(df.describe())
 
 
 #
@@ -79,18 +88,17 @@ def plotDecisionBoundary(model, X, y):
 # with the mean feature / column value
 #
 # .. your code here ..
+df = df.fillna(value=df.mean())
 
 
 
-#
+#%%
 # TODO: Do train_test_split. Use the same variable names as on the EdX platform in
 # the reading material, but set the random_state=7 for reproduceability, and keep
 # the test_size at 0.5 (50%).
 #
 # .. your code here ..
-
-
-
+from sklearn.model_selection import train_test_split
 
 #
 # TODO: Experiment with the basic SKLearn preprocessing scalers. We know that
@@ -101,33 +109,44 @@ def plotDecisionBoundary(model, X, y):
 # of your dataset actually get transformed?
 #
 # .. your code here ..
+from sklearn.preprocessing import Normalizer, MinMaxScaler, RobustScaler, StandardScaler
+from sklearn.decomposition import PCA
+from sklearn.manifold import Isomap
+from sklearn.neighbors import KNeighborsClassifier
 
 
+for afunc in (Normalizer, MinMaxScaler, RobustScaler, StandardScaler):
+    scaler = afunc()
+    for w in ['uniform', 'distance']:
+        for K in range(1,16):
+            data_train, data_test, label_train, label_test = train_test_split(df, label, test_size=.5, random_state=7)
 
+            scaler.fit(data_train)
+            data_train = scaler.transform(data_train)
+            data_test = scaler.transform(data_test)
+    
+#    print(data_train.describe())
 
 #
-# PCA and Isomap are your new best friends
-model = None
-if Test_PCA:
-  print "Computing 2D Principle Components"
+# PCA and Isomap are your new best friends  
+            model = None
+            if Test_PCA:
+                print "Computing 2D Principle Components"
   #
   # TODO: Implement PCA here. Save your model into the variable 'model'.
   # You should reduce down to two dimensions.
   #
   # .. your code here ..
-
-  
-
-else:
-  print "Computing 2D Isomap Manifold"
+                model = PCA(n_components=2)
+            else:
+#                print "Computing 2D Isomap Manifold"
   #
   # TODO: Implement Isomap here. Save your model into the variable 'model'
   # Experiment with K values from 5-10.
   # You should reduce down to two dimensions.
   #
   # .. your code here ..
-  
-
+                model = Isomap(n_components=2)
 
 
 #
@@ -136,8 +155,9 @@ else:
 # back into the variables themselves.
 #
 # .. your code here ..
-
-
+            model.fit(data_train)
+            data_train = model.transform(data_train)
+            data_test = model.transform(data_test)
 
 # 
 # TODO: Implement and train KNeighborsClassifier on your projected 2D
@@ -148,8 +168,10 @@ else:
 # parameter affects the results.
 #
 # .. your code here ..
+   
 
-
+            knn = KNeighborsClassifier(n_neighbors=K, weights=w)
+            knn.fit(data_train, label_train)
 
 #
 # INFO: Be sure to always keep the domain of the problem in mind! It's
@@ -167,6 +189,7 @@ else:
 # TODO: Calculate + Print the accuracy of the testing set
 #
 # .. your code here ..
+            accuracy = knn.score(data_test, label_test)
+            print('For K: %d, accuracy: %.4f, scaler: %s, weights: %s' % (K, accuracy, afunc.__name__, w))
 
-
-plotDecisionBoundary(knmodel, X_test, y_test)
+#plotDecisionBoundary(knmodel, X_test, y_test)
