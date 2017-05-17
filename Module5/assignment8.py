@@ -27,14 +27,14 @@ def drawLine(model, X_test, y_test, title):
   plt.show()
 
 
-#
+#%%
 # TODO: Load up the data here into a variable called 'X'.
 # As usual, do a .describe and a print of your dataset and
 # compare it to the dataset loaded in a text file or in a
 # spread sheet application
 #
 # .. your code here ..
-
+X = pd.read_csv(r"C:\Users\Sjaak\Documents\DAT210x\Module5\Datasets\life_expectancy.csv", header=0, sep='\t')
 
 #
 # TODO: Create your linear regression model here and store it in a
@@ -42,10 +42,9 @@ def drawLine(model, X_test, y_test, title):
 # with it yet:
 #
 # .. your code here ..
+from sklearn.linear_model import LinearRegression
 
-
-
-#
+#%%
 # TODO: Slice out your data manually (e.g. don't use train_test_split,
 # but actually do the Indexing yourself. Set X_train to be year values
 # LESS than 1986, and y_train to be corresponding WhiteMale age values.
@@ -54,7 +53,11 @@ def drawLine(model, X_test, y_test, title):
 # of this document before proceeding.
 #
 # .. your code here ..
+X_train = X[X['Year']<1986][['Year']]
+for feature in ['WhiteMale', 'BlackFemale']:
+    model = LinearRegression()
 
+    y_train = X[X['Year']<1986][[feature]]
 
 
 #
@@ -66,14 +69,16 @@ def drawLine(model, X_test, y_test, title):
 # 2030 and 2045 extrapolation.
 #
 # .. your code here ..
-
+    model.fit(X_train, y_train)
+    
+    drawLine(model, X_train, y_train, feature)
 
 #
 # TODO: Print the actual 2014 WhiteMale life expectancy from your
 # loaded dataset
 #
 # .. your code here ..
-
+    print(X[X['Year']==2014][feature])
 
 
 # 
@@ -86,7 +91,7 @@ def drawLine(model, X_test, y_test, title):
 
 
 
-#
+#%%
 # TODO: Lastly, print out a correlation matrix for your entire
 # dataset, and display a visualization of the correlation
 # matrix, just as we described in the visualization section of
@@ -94,9 +99,13 @@ def drawLine(model, X_test, y_test, title):
 #
 # .. your code here ..
 
+df = X.drop('Year', axis=1)
+plt.imshow(df.corr(), cmap=plt.cm.Blues, interpolation='nearest')
+plt.colorbar()
+tick_marks = [i for i in range(len(df.columns))]
+plt.xticks(tick_marks, df.columns, rotation='vertical')
+plt.yticks(tick_marks, df.columns)
 plt.show()
-
-
 
 
 #

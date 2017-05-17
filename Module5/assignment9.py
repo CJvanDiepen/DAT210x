@@ -68,7 +68,7 @@ def drawPlane(model, X_test, y_test, title, R2):
 # INFO: Let's get started!
 
 
-#
+#%%
 # TODO: First, as is your habit, inspect your dataset in a text
 # editor, or spread sheet application. The first thing you should
 # notice is that the first column is both unique (the name of each)
@@ -83,7 +83,7 @@ def drawPlane(model, X_test, y_test, title, R2):
 # called X:
 #
 # .. your code here ..
-
+X = pd.read_csv(r"C:\Users\Sjaak\Documents\DAT210x\Module5\Datasets\College.csv", header=0, index_col=0)
 
 #
 # INFO: This line isn't necessary for your purposes; but we'd just
@@ -102,8 +102,7 @@ X.Private = X.Private.map({'Yes':1, 'No':0})
 # with it yet:
 #
 # .. your code here ..
-
-
+from sklearn.linear_model import LinearRegression
 
 
 #
@@ -111,7 +110,7 @@ X.Private = X.Private.map({'Yes':1, 'No':0})
 # number of accepted students, as a function of the amount
 # charged for room and board.
 
-#
+#%%
 # TODO: Using indexing, create two slices (series). One will just
 # store the room and board column, the other will store the accepted
 # students column. Then use train_test_split to cut your data up
@@ -119,6 +118,16 @@ X.Private = X.Private.map({'Yes':1, 'No':0})
 # a random_state of 7.
 #
 # .. your code here ..
+from sklearn.model_selection import train_test_split
+
+for pair in [['Room.Board','Accept'],['Enroll', 'Accept'], ['F.Undergrad', 'Accept']]:
+    model = LinearRegression()
+    
+    slice1 = X[[pair[0]]]
+    slice2 = X[[pair[1]]]
+    
+    X_train, X_test, y_train, y_test = train_test_split(slice1, slice2, test_size=.3, random_state=7)
+
 
 #
 # TODO: Fit and score your model appropriately. Store the score in the
@@ -126,8 +135,13 @@ X.Private = X.Private.map({'Yes':1, 'No':0})
 #
 # .. your code here ..
 
+    model.fit(X_train, y_train)
+
+    score = model.score(X_test, y_test)
+
 # INFO: We'll take it from here, buddy:
-drawLine(model, X_test, y_test, "Accept(Room&Board)", score)
+#    drawLine(model, X_test, y_test, "Accept(Room&Board)", score)
+    drawLine(model, X_test, y_test, "%s(%s)" % (pair[1], pair[0]), score)
 
 
 
@@ -138,7 +152,7 @@ drawLine(model, X_test, y_test, "Accept(Room&Board)", score)
 # per college.
 #
 # .. your code here ..
-drawLine(model, X_test, y_test, "Accept(Enroll)", score)
+#drawLine(model, X_test, y_test, "Accept(Enroll)", score)
 
 
 
@@ -148,10 +162,10 @@ drawLine(model, X_test, y_test, "Accept(Enroll)", score)
 # students per college.
 #
 # .. your code here ..
-drawLine(model, X_test, y_test, "Accept(F.Undergrad)", score)
+#drawLine(model, X_test, y_test, "Accept(F.Undergrad)", score)
 
 
-#
+#%%
 # TODO: Duplicate the process above (almost). This time is going to be
 # a bit more complicated. Instead of modeling one feature as a function
 # of another, you will attempt to do multivariate linear regression to
@@ -164,6 +178,18 @@ drawLine(model, X_test, y_test, "Accept(F.Undergrad)", score)
 # inputs. Your training labels will remain a single slice.
 #
 # .. your code here ..
+pair = [['Room.Board', 'Enroll'], 'Accept']
+
+model = LinearRegression()
+
+slice1 = X[pair[0]]
+slice2 = X[[pair[1]]]
+
+X_train, X_test, y_train, y_test = train_test_split(slice1, slice2, test_size=.3, random_state=7)
+model.fit(X_train, y_train)
+
+score = model.score(X_test, y_test)
+
 drawPlane(model, X_test, y_test, "Accept(Room&Board,Enroll)", score)
 
 
