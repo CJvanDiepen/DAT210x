@@ -11,7 +11,7 @@ import time
 # You can adjust them after completing the lab
 C = 1
 kernel = 'linear'
-iterations = 5000   # TODO: Change to 200000 once you get to Question#2
+iterations = 200000   # TODO: Change to 200000 once you get to Question#2
 
 #
 # INFO: You can set this to false if you want to
@@ -90,7 +90,7 @@ def drawPlots(model, X_train, X_test, y_train, y_test, wintitle='Figure 1'):
   print "Max 2D Score: ", max_2d_score
   fig.set_tight_layout(True)
 
-
+#%%
 def benchmark(model, X_train, X_test, y_train, y_test, wintitle='Figure 1'):
   print '\n\n' + wintitle + ' Results'
   s = time.time()
@@ -99,6 +99,8 @@ def benchmark(model, X_train, X_test, y_train, y_test, wintitle='Figure 1'):
     # TODO: train the classifier on the training data / labels:
     #
     # .. your code here ..
+    model.fit(X_train, y_train)
+    
   print "{0} Iterations Training Time: ".format(iterations), time.time() - s
 
 
@@ -108,28 +110,30 @@ def benchmark(model, X_train, X_test, y_train, y_test, wintitle='Figure 1'):
     # TODO: score the classifier on the testing data / labels:
     #
     # .. your code here ..
+    score = model.score(X_test, y_test)
+
   print "{0} Iterations Scoring Time: ".format(iterations), time.time() - s
   print "High-Dimensionality Score: ", round((score*100), 3)
 
 
 
-# 
+#%%
 # TODO: Load up the wheat dataset into dataframe 'X'
 # Verify you did it properly.
 # Indices shouldn't be doubled, nor weird headers...
 #
 # .. your code here ..
-
+X = pd.read_csv(r"C:\Users\diepencjv\repos\DAT210x\Module6\Datasets\wheat.data", header=0, index_col=0)
 
 # INFO: An easy way to show which rows have nans in them
-#print X[pd.isnull(X).any(axis=1)]
+print X[pd.isnull(X).any(axis=1)]
 
 
 # 
 # TODO: Go ahead and drop any row with a nan
 #
 # .. your code here ..
-
+X = X.dropna()
 
 
 # 
@@ -146,8 +150,9 @@ def benchmark(model, X_train, X_test, y_train, y_test, wintitle='Figure 1'):
 # you in Module 5 -- canadian:0, kama:1, and rosa:2
 #
 # .. your code here ..
-
-
+y = X['wheat_type']
+y = y.map({'canadian':1,'kama':0,'rosa':2})
+X = X.drop('wheat_type', axis=1)
 
 # 
 # TODO: Split your data into test / train sets
@@ -155,7 +160,9 @@ def benchmark(model, X_train, X_test, y_train, y_test, wintitle='Figure 1'):
 # Use variable names: X_train, X_test, y_train, y_test
 #
 # .. your code here ..
+from sklearn.model_selection import train_test_split
 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=.3, random_state=7)
 
 
 #
@@ -163,23 +170,25 @@ def benchmark(model, X_train, X_test, y_train, y_test, wintitle='Figure 1'):
 # Use a linear kernel, and set the C value to C
 #
 # .. your code here ..
+from sklearn.svm import SVC
 
+svc = SVC(C=C, kernel='linear')
 
 #
 # TODO: Create an KNeighbors classifier named knn
 # Set the neighbor count to 5
 #
 # .. your code here ..
+from sklearn.neighbors import KNeighborsClassifier
 
+knn = KNeighborsClassifier(n_neighbors=5)
 
-
-
-
-benchmark(knn, X_train, X_test, y_train, y_test, 'KNeighbors')
-drawPlots(knn, X_train, X_test, y_train, y_test, 'KNeighbors')
 
 benchmark(svc, X_train, X_test, y_train, y_test, 'SVC')
 drawPlots(svc, X_train, X_test, y_train, y_test, 'SVC')
+
+benchmark(knn, X_train, X_test, y_train, y_test, 'KNeighbors')
+drawPlots(knn, X_train, X_test, y_train, y_test, 'KNeighbors')
 
 plt.show()
 
